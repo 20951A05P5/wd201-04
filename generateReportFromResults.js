@@ -1,42 +1,44 @@
 let fs = require("fs");
 
-let generateFeedback = (passed, results) => {
-  const assertionResults = results["assertionResults"]
-    .map((item) => {
-      let status = item["status"];
-      let title = item["title"];
-      let statusSymbol = status == "passed" ? "✓" : "✗";
+let generateFeedback=(passed, results)=>{
+  const assertionResults=results["assertionResults"]
+    .map((item)=>{
+      let status=item["status"];
+      let title=item["title"];
+      
+      let statusSymbol=status=="passed" ? "✓" : "✗";
       return `${statusSymbol} ${title}`;
     })
     .join("\n\n");
 
-  let errorMessage = results["message"];
-
-  const feedback = assertionResults + "\n\n" + errorMessage;
+  let errorMessage=results["message"];
+  const feedback=assertionResults + "\n\n" + errorMessage;
 
   return feedback;
 };
 
-const writeReport = (data) => {
+const writeReport=(data)=>{
   console.log(data);
-  let reportFile = "./report.json";
+  let reportFile="./report.json";
+  
   fs.writeFileSync(reportFile, JSON.stringify(data));
 };
 
-const readFile = async (filePath) => {
+const readFile=async (filePath)=>{
   try {
-    const data = await fs.promises.readFile(filePath, "utf8");
+    const data=await fs.promises.readFile(filePath, "utf8");
     return data;
   } catch (err) {
-    console.log("File not found | Grading Skipped");
+    console.log("No file existed | Grading Skipped");
   }
 };
 
-readFile("results.json").then((data) => {
+readFile("results.json").then((data)=>{
   if (data) {
-    let results = JSON.parse(data);
-    const passed = results["testResults"][0]["status"] == "passed";
-    let feedback = generateFeedback(passed, results["testResults"][0]);
+    let results=JSON.parse(data);
+    
+    const passed=results["testResults"][0]["status"] == "passed";
+    let feedback=generateFeedback(passed, results["testResults"][0]);
     writeReport({
       version: 0,
       grade: passed ? "accept" : "reject",
